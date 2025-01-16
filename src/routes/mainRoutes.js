@@ -2,7 +2,8 @@
 
 const express = require('express');
 const router = express.Router();
-const pool = require('../config/const'); // Assuming `const.js` exports a PostgreSQL pool
+const { pool } = require('../../config/const');
+
 
 /** Users CRUD Operations **/
 
