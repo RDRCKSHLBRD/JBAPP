@@ -1,9 +1,11 @@
-// src/routes/mainRoutes.js
-
 const express = require('express');
 const router = express.Router();
 const { pool } = require('../../config/const');
 
+/** ===PING=== **/
+router.get('/ping', (req, res) => {
+    res.status(200).json({ message: 'pong' });
+});
 
 /** Users CRUD Operations **/
 

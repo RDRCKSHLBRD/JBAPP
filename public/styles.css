@@ -9,11 +9,9 @@ body {
   padding: 0;
 }
 
-
 header {
   background-color: #282c34;
   padding: .5rem;
-  
   text-align: left;
 }
 
@@ -38,7 +36,6 @@ header h1 {
 .nav-menu a {
   color: #61dafb;
   text-decoration: none;
-  
 }
 
 main {
@@ -56,9 +53,8 @@ main {
 }
 
 .title {
-font-weight: 300;
+  font-weight: 300;
 }
-
 
 footer {
   position: fixed;
@@ -71,10 +67,25 @@ footer {
   color: #61dafb;
 }
 
-
 .footTAG {
   font-size: .8em;
-margin-right: 2em;
+  margin-right: 2em;
+}
 
+.refresh-button {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #61dafb;
+  color: #1e1e2f;
+  border: none;
+  border-radius: 3px;
+  font-size: 1rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: bold;
+}
 
+.refresh-button:hover {
+  background-color: #21a1f1;
 }
