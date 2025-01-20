@@ -19,36 +19,43 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #00f; /* Blue text */
+            color: #48BBD8; /* Blue text */
         }
 
         #password-prompt input {
             padding: 0.5rem;
             margin-top: 1rem;
             font-size: 1rem;
-            border: 2px solid #00f;
-            border-radius: 5px;
+            border: 1px solid #b3d4e2;
+            border-radius: 2px;
             background: none;
-            color: #00f;
+            color: #b5c6bd;
         }
 
         #password-prompt button {
             margin-top: 1rem;
             padding: 0.5rem 1rem;
             font-size: 1rem;
-            background-color: #00f;
-            color: #fff;
+            background-color: #10569b;
+            color: #f2f4ed;
             border: none;
-            border-radius: 5px;
+            border-radius: 2px;
             cursor: pointer;
         }
+
+        .text {
+          font-family: Arial, Helvetica, sans-serif;
+          font-weight:300;
+
+        }
+
     </style>
 </head>
 
 <body>
     <div id="password-prompt">
-        <h1>Enter Password</h1>
-        <input type="password" id="password" placeholder="Enter password" />
+        
+        <input type="text" id="password" placeholder="Enter password" />
         <button id="submit-password">Submit</button>
     </div>
     <script src="js/main.js"></script>

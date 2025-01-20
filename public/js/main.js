@@ -2,9 +2,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiLogDiv = document.getElementById('api-log');
     const dataOutputDiv = document.getElementById('data-output');
     const responseElement = document.getElementById('response');
+    const tableDisplay = document.getElementById('table-display');
+    const resetAllButton = document.getElementById('reset-all-button');
+    const refreshButton = document.getElementById('refresh-button');
 
     // Log API call activity
     function logApiCall(endpoint, method, status) {
+        if (!apiLogDiv) {
+            console.error('Error: #api-log element not found in the DOM.');
+            return;
+        }
         const logEntry = document.createElement('div');
         logEntry.textContent = `${method} ${endpoint} - Status: ${status}`;
         apiLogDiv.appendChild(logEntry);
@@ -36,16 +43,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Ping JBAPP server
-    const refreshButton = document.getElementById('refresh-button');
     if (refreshButton) {
         refreshButton.addEventListener('click', async () => {
             try {
                 const response = await fetch('/api/ping');
                 const data = await response.json();
-                responseElement.innerText = `Server Response: ${data.message}`;
+                if (responseElement) {
+                    responseElement.innerText = `Server Response: ${data.message}`;
+                }
                 logApiCall('/api/ping', 'GET', response.status);
             } catch (error) {
-                responseElement.innerText = `Error: ${error.message}`;
+                if (responseElement) {
+                    responseElement.innerText = `Error: ${error.message}`;
+                }
                 logApiCall('/api/ping', 'GET', 'Error');
                 console.error('Error pinging the server:', error);
             }
@@ -54,6 +64,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch data from JBAPP endpoints
     async function fetchData(endpoint) {
+        if (!dataOutputDiv) {
+            console.error('Error: #data-output element not found in the DOM.');
+            return;
+        }
         try {
             const response = await fetch(endpoint);
             const data = await response.json();
@@ -67,10 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch dynamic database tables
     async function fetchTables() {
+        if (!tableDisplay) {
+            console.error('Error: #table-display element not found in the DOM.');
+            return;
+        }
         try {
             const response = await fetch('/api/tables');
             const tableData = await response.json();
-            const tableDisplay = document.getElementById('table-display');
             tableDisplay.innerHTML = ''; // Clear existing data
 
             for (const [tableName, rows] of Object.entries(tableData)) {
@@ -82,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Reset all tables
-    const resetAllButton = document.getElementById('reset-all-button');
     if (resetAllButton) {
         resetAllButton.addEventListener('click', async () => {
             if (confirm('Are you sure you want to reset all tables? This action cannot be undone.')) {
@@ -104,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Load tables on page load if on the dashboard
-    if (document.getElementById('table-display')) {
+    if (tableDisplay) {
         fetchTables();
     }
 

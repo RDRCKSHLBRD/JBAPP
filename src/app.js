@@ -10,9 +10,17 @@ dotenv.config(); // Load environment variables
 const app = express();
 const PASSWORD = process.env.SITE_PASSWORD; // Password from .env file
 
+// Ensure the SITE_PASSWORD is set
+if (!PASSWORD) {
+    throw new Error('SITE_PASSWORD is not set in the environment variables.');
+}
+
 // Middleware to parse JSON bodies and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Session middleware for authentication
 app.use(
@@ -25,17 +33,22 @@ app.use(
 
 // Middleware to enforce password protection
 app.use((req, res, next) => {
-    // Allow access to static files and APIs without authentication
-    if (req.session.authenticated || req.url.startsWith('/api')) {
+    // Allow static files and API routes without authentication
+    if (
+        req.session.authenticated ||
+        req.url.startsWith('/api') ||
+        req.url.startsWith('/styles.css') ||
+        req.url.startsWith('/js/')
+    ) {
         return next();
     }
 
-    // Serve the password prompt page for unauthenticated users
+    // Allow access to the password prompt page
     if (req.url === '/' || req.url === '/login') {
         return next();
     }
 
-    // Deny access to other routes if not authenticated
+    // Deny access to other routes
     res.status(401).sendFile(path.join(__dirname, '../public/index.html'));
 });
 
@@ -50,9 +63,6 @@ app.post('/login', (req, res) => {
         res.status(401).json({ error: 'Invalid password' });
     }
 });
-
-// Serve static files from the "public" directory
-app.use(express.static(path.join(__dirname, '../public')));
 
 // Mount main routes under the `/api` namespace
 app.use('/api', mainRoutes);
