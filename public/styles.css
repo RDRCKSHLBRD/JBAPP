@@ -38,6 +38,7 @@ header h1 {
 
 main {
   padding: 2rem;
+  padding-bottom: 6rem;
 }
 
 #api-log,
