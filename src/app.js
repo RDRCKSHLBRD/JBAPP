@@ -2,18 +2,32 @@ const express = require('express');
 const dotenv = require('dotenv');
 const session = require('express-session');
 const path = require('path');
-const { PORT } = require('../config/const');
-const mainRoutes = require('./routes/mainRoutes'); // Correct path to mainRoutes.js
+const { PORT } = require('../config/const.js');
+const mainRoutes = require('./routes/mainRoutes.js');
+const { createClient } = require('redis'); // Redis client from redis@4.x
+const { RedisStore } = require('connect-redis'); // Correct import for connect-redis@8.x
 
 dotenv.config(); // Load environment variables
 
 const app = express();
 const PASSWORD = process.env.SITE_PASSWORD; // Password from .env file
 
-// Ensure the SITE_PASSWORD is set
+// Ensure required environment variables are set
 if (!PASSWORD) {
     throw new Error('SITE_PASSWORD is not set in the environment variables.');
 }
+
+// Create and connect Redis client
+const redisClient = createClient({
+    url: process.env.REDIS_URL,
+});
+redisClient.connect().catch(console.error); // Handle connection errors
+
+// Create Redis store instance
+const redisStore = new RedisStore({
+    client: redisClient,
+    prefix: 'sess:',
+});
 
 // Middleware to parse JSON bodies and URL-encoded data
 app.use(express.json());
@@ -22,18 +36,23 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Session middleware for authentication
+// Session middleware for authentication using Redis store
 app.use(
     session({
-        secret: 'your-secret-key', // Use a strong secret in production
+        store: redisStore, // Use the Redis store
+        secret: 'your_secret_key',
         resave: false,
-        saveUninitialized: true,
+        saveUninitialized: false,
+        cookie: {
+            secure: false, // Set to true if using HTTPS
+            httpOnly: true,
+            maxAge: 1000 * 60 * 60 * 24, // 1 day
+        },
     })
 );
 
 // Middleware to enforce password protection
 app.use((req, res, next) => {
-    // Allow static files and API routes without authentication
     if (
         req.session.authenticated ||
         req.url.startsWith('/api') ||
@@ -43,12 +62,10 @@ app.use((req, res, next) => {
         return next();
     }
 
-    // Allow access to the password prompt page
     if (req.url === '/' || req.url === '/login') {
         return next();
     }
 
-    // Deny access to other routes
     res.status(401).sendFile(path.join(__dirname, '../public/index.html'));
 });
 
