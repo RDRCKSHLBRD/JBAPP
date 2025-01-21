@@ -46,15 +46,31 @@ main {
 #table-display {
   background-color: #20232a;
   border: 1px solid #61dafb;
+  color: #d0eae5;
   border-radius: 3px;
+  font-weight: 200;
   padding: 1rem;
   margin-top: 1rem;
   max-height: 300px;
   overflow-y: auto;
 }
 
+#response {
+  padding-top: .7em;
+  color: #AAAA17;
+}
+
 .title {
-  font-weight: 300;
+  color: #21a1f1;
+  font-weight: 100;
+  margin-bottom: .2em;
+}
+
+.table-title,
+.data-title
+{
+  color: #3DA3A8;
+  font-weight: 100;
 }
 
 footer {
