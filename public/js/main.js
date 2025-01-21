@@ -62,41 +62,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Fetch data from JBAPP endpoints
-    async function fetchData(endpoint) {
-        if (!dataOutputDiv) {
-            console.error('Error: #data-output element not found in the DOM.');
-            return;
-        }
-        try {
-            const response = await fetch(endpoint);
-            const data = await response.json();
-            logApiCall(endpoint, 'GET', response.status);
-            dataOutputDiv.innerHTML += `<h3>Data from ${endpoint}</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
-        } catch (error) {
-            logApiCall(endpoint, 'GET', 'Error');
-            console.error(`Error fetching data from ${endpoint}:`, error);
-        }
+   // Fetch data from JBAPP endpoints
+async function fetchData(endpoint) {
+    if (!dataOutputDiv) {
+        console.error('Error: #data-output element not found in the DOM.');
+        return;
     }
+    try {
+        const response = await fetch(endpoint);
+        const data = await response.json();
+        logApiCall(endpoint, 'GET', response.status);
+
+        // Create the <h3> element and add a class
+        const dataTitle = document.createElement('h3');
+        dataTitle.classList.add('data-title'); // Add your desired class here
+        dataTitle.textContent = `Data from ${endpoint}`;
+
+        // Create the <pre> element for the data
+        const dataContent = document.createElement('pre');
+        dataContent.textContent = JSON.stringify(data, null, 2);
+
+        // Append the title and data to the output div
+        dataOutputDiv.appendChild(dataTitle);
+        dataOutputDiv.appendChild(dataContent);
+    } catch (error) {
+        logApiCall(endpoint, 'GET', 'Error');
+        console.error(`Error fetching data from ${endpoint}:`, error);
+    }
+}
+
 
     // Fetch dynamic database tables
-    async function fetchTables() {
-        if (!tableDisplay) {
-            console.error('Error: #table-display element not found in the DOM.');
-            return;
-        }
-        try {
-            const response = await fetch('/api/tables');
-            const tableData = await response.json();
-            tableDisplay.innerHTML = ''; // Clear existing data
-
-            for (const [tableName, rows] of Object.entries(tableData)) {
-                tableDisplay.innerHTML += `<h3>Table: ${tableName}</h3><pre>${JSON.stringify(rows, null, 2)}</pre>`;
-            }
-        } catch (error) {
-            console.error('Error fetching tables:', error);
-        }
+// Fetch dynamic database tables
+async function fetchTables() {
+    if (!tableDisplay) {
+        console.error('Error: #table-display element not found in the DOM.');
+        return;
     }
+    try {
+        const response = await fetch('/api/tables');
+        const tableData = await response.json();
+        tableDisplay.innerHTML = ''; // Clear existing data
+
+        for (const [tableName, rows] of Object.entries(tableData)) {
+            // Create the <h3> element and add a class
+            const tableTitle = document.createElement('h3');
+            tableTitle.classList.add('table-title'); // Add your desired class here
+            tableTitle.textContent = `Table: ${tableName}`;
+
+            // Append the title and rows to the display
+            tableDisplay.appendChild(tableTitle);
+            const tableContent = document.createElement('pre');
+            tableContent.textContent = JSON.stringify(rows, null, 2);
+            tableDisplay.appendChild(tableContent);
+        }
+    } catch (error) {
+        console.error('Error fetching tables:', error);
+    }
+}
 
     // Reset all tables
     if (resetAllButton) {
