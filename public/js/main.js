@@ -121,26 +121,39 @@ async function fetchTables() {
     }
 }
 
-    // Reset all tables
-    if (resetAllButton) {
-        resetAllButton.addEventListener('click', async () => {
-            if (confirm('Are you sure you want to reset all tables? This action cannot be undone.')) {
-                try {
-                    const response = await fetch('/api/reset/all', { method: 'DELETE' });
-                    const result = await response.json();
-                    if (response.ok) {
-                        alert(result.message);
-                        logApiCall('/api/reset/all', 'DELETE', response.status);
-                        fetchTables(); // Reload table data after reset
-                    } else {
-                        alert(`Error: ${result.error}`);
-                    }
-                } catch (error) {
-                    console.error('Error resetting tables:', error);
-                }
+   // Reset all tables
+if (resetAllButton) {
+    resetAllButton.addEventListener('click', async () => {
+        if (confirm('Are you sure you want to reset all tables? This action cannot be undone.')) {
+            const resetPassword = prompt('Enter the reset password:');
+            if (!resetPassword) {
+                alert('Password is required to reset tables.');
+                return;
             }
-        });
-    }
+
+            try {
+                const response = await fetch('/api/reset/all', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: resetPassword }),
+                });
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.message);
+                    logApiCall('/api/reset/all', 'DELETE', response.status);
+                    fetchTables(); // Reload table data after reset
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error resetting tables:', error);
+                alert('An error occurred while resetting tables.');
+            }
+        }
+    });
+}
+
 
     // Load tables on page load if on the dashboard
     if (tableDisplay) {
