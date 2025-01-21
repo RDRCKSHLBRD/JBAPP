@@ -1,3 +1,6 @@
+
+// mainRoutes.js
+
 const express = require('express');
 const { pool } = require('../../config/const.js');
 
@@ -189,6 +192,13 @@ router.get('/tables', async (req, res) => {
 
 // Reset all tables dynamically
 router.delete('/reset/all', async (req, res) => {
+    const { password } = req.body;
+
+    // Check if the provided password matches the environment variable
+    if (password !== process.env.DB_RESET_PASS) {
+        return res.status(403).json({ error: 'Unauthorized: Incorrect password.' });
+    }
+
     try {
         await pool.query(`
             DO $$ 
@@ -211,6 +221,7 @@ router.delete('/reset/all', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 // Export router for CommonJS
 module.exports = router;
