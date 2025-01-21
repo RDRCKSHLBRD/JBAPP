@@ -1,6 +1,7 @@
 const express = require('express');
+const { pool } = require('../../config/const.js');
+
 const router = express.Router();
-const { pool } = require('../../config/const');
 
 /** ===PING=== **/
 router.get('/ping', (req, res) => {
@@ -161,7 +162,7 @@ router.delete('/jobs/:id', async (req, res) => {
     }
 });
 
-/** ===Dynamic Table Management=== **/
+/** Dynamic Table Management **/
 
 // Fetch all tables and their data
 router.get('/tables', async (req, res) => {
@@ -211,4 +212,5 @@ router.delete('/reset/all', async (req, res) => {
     }
 });
 
+// Export router for CommonJS
 module.exports = router;
