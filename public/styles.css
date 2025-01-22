@@ -93,11 +93,11 @@ footer {
 #reset-all-button {
   display: inline-block;
   margin-top: 1rem;
-  padding: 0.5rem 1rem;
+  padding: 0.2rem .3rem;
   background-color: #61dafb;
   color: #1e1e2f;
   border: none;
-  border-radius: 3px;
+  border-radius: 2px;
   font-size: 1rem;
   cursor: pointer;
   text-transform: uppercase;
