@@ -30,21 +30,30 @@ const getUserById = async (req, res) => {
 };
 
 // Create user
-
 const createUser = async (req, res) => {
     const { username, email, password, terms_agreed } = req.body;
+
+    // Ensure `terms_agreed` has a valid boolean value
+    const termsAgreedValue = terms_agreed === true; // Convert to true/false explicitly
+
     try {
-        const hashedPassword = await bcrypt.hash(password, 10); // Hash password
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Insert into the database
         const result = await pool.query(
             'INSERT INTO users (username, email, password, terms_agreed) VALUES ($1, $2, $3, $4) RETURNING *',
-            [username, email, hashedPassword, terms_agreed]
+            [username, email, hashedPassword, termsAgreedValue]
         );
+
+        // Respond with the created user
         res.status(201).json(result.rows[0]);
     } catch (err) {
         console.error('Error creating user:', err);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
 
 
 
