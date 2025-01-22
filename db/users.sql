@@ -14,5 +14,5 @@ CREATE TABLE users (
 -- Insert sample data
 INSERT INTO users (username, email, password, terms_agreed)
 VALUES 
-    ('jdoe', 'jdoe@example.com', 'hashed_password_1', TRUE),
-    ('asmith', 'asmith@example.com', 'hashed_password_2', FALSE);
+    ('jdoe', 'jdoe@example.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', TRUE),
+    ('asmith', 'asmith@example.com', '$2a$10$IgMNeWXzv1vD3V7mQjQpquasMUAay9vQBIS6CSeoT6/HixxY7rsTi', FALSE);
