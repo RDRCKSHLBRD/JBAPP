@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const session = require('express-session');
 const path = require('path');
 const { PORT } = require('../config/const.js');
-const mainRoutes = require('./routes/mainRoutes.js');
+const routeIndex = require('./routes/routeIndex'); // Use the consolidated router file
 const { createClient } = require('redis'); // Redis client from redis@4.x
 const { RedisStore } = require('connect-redis'); // Correct import for connect-redis@8.x
 
@@ -81,8 +81,8 @@ app.post('/login', (req, res) => {
     }
 });
 
-// Mount main routes under the `/api` namespace
-app.use('/api', mainRoutes);
+// Mount the consolidated routes under `/api`
+app.use('/api', routeIndex);
 
 // Start the server
 app.listen(PORT, () => {
