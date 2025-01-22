@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
         try {
-            const response = await fetch("/api/tables");
+            const response = await fetch("/api/admin/tables");
             const tableData = await response.json();
             tableDisplay.innerHTML = ""; // Clear existing data
 
