@@ -1,6 +1,7 @@
 // queries // user.js
 
 const { pool } = require('../../config/const.js');
+const bcrypt = require('bcrypt');
 
 // Get all users
 const getAllUsers = async (req, res) => {
@@ -29,12 +30,14 @@ const getUserById = async (req, res) => {
 };
 
 // Create user
+
 const createUser = async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, terms_agreed } = req.body;
     try {
+        const hashedPassword = await bcrypt.hash(password, 10); // Hash password
         const result = await pool.query(
-            'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *',
-            [username, email, password]
+            'INSERT INTO users (username, email, password, terms_agreed) VALUES ($1, $2, $3, $4) RETURNING *',
+            [username, email, hashedPassword, terms_agreed]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -42,6 +45,8 @@ const createUser = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+
 
 // Update user
 const updateUser = async (req, res) => {
