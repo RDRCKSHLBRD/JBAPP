@@ -1,17 +1,14 @@
-//routeIndex.js
-
 const express = require('express');
+const router = express.Router();
+
 const usersRoutes = require('./usersRoutes');
 const jobsRoutes = require('./jobsRoutes');
 const adminRoutes = require('./adminRoutes');
 
-const router = express.Router();
-
 router.use('/users', usersRoutes);
 router.use('/jobs', jobsRoutes);
-router.use('/admin', adminRoutes); // For `/tables` and `/reset/all`
+router.use('/admin', adminRoutes);
 
-// Example: Add a ping route here
 router.get('/ping', (req, res) => {
     res.status(200).json({ message: 'pong' });
 });
