@@ -31,26 +31,31 @@ const getUserById = async (req, res) => {
 
 // Create user
 const createUser = async (req, res) => {
-    const { username, email, password, terms_agreed } = req.body;
+    const { username, email, password, termsAgreed } = req.body; // Use `termsAgreed` as sent by the frontend
 
-    // Ensure `terms_agreed` has a valid boolean value
-    const termsAgreedValue = terms_agreed === true; // Convert to true/false explicitly
+    // Explicitly convert `termsAgreed` to a boolean
+    const termsAgreedValue = termsAgreed === true; // Ensure true/false
+    console.log("Received payload:", req.body);
+    console.log("Processed terms_agreed value:", termsAgreedValue);
 
     try {
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
+        console.log("Hashed password generated successfully.");
 
-        // Insert into the database
+        // Insert into the database with the correctly mapped value
         const result = await pool.query(
-            'INSERT INTO users (username, email, password, terms_agreed) VALUES ($1, $2, $3, $4) RETURNING *',
+            'INSERT INTO users (username, email, password, terms_agreed) VALUES ($1, $2, $3, $4::BOOLEAN) RETURNING *',
             [username, email, hashedPassword, termsAgreedValue]
         );
+
+        console.log("User inserted into database:", result.rows[0]);
 
         // Respond with the created user
         res.status(201).json(result.rows[0]);
     } catch (err) {
-        console.error('Error creating user:', err);
-        res.status(500).json({ error: 'Internal server error' });
+        console.error("Error creating user:", err.message);
+        res.status(500).json({ error: "Internal server error" });
     }
 };
 
