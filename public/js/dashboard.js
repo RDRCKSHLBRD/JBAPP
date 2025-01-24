@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 try {
-                    const response = await fetch("/api/reset/all", {
+                    const response = await fetch("/api/admin/reset/all", {
                         method: "DELETE",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ password: resetPassword }),
