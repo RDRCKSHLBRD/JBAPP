@@ -1,12 +1,10 @@
-// queries // user.js
-
 const { pool } = require('../../config/const.js');
 const bcrypt = require('bcrypt');
 
-// Get all users
+// Get all users (account-related information only)
 const getAllUsers = async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM users');
+        const result = await pool.query('SELECT id, email, subscription_status, created_at FROM users');
         res.status(200).json(result.rows);
     } catch (err) {
         console.error('Error fetching users:', err);
@@ -18,7 +16,7 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
     const { id } = req.params;
     try {
-        const result = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+        const result = await pool.query('SELECT id, email, subscription_status, created_at FROM users WHERE id = $1', [id]);
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
@@ -29,47 +27,44 @@ const getUserById = async (req, res) => {
     }
 };
 
-// Create user
+// Create user (account creation)
 const createUser = async (req, res) => {
-    const { username, email, password, termsAgreed } = req.body; // Use `termsAgreed` as sent by the frontend
+    const { email, password, termsAgreed } = req.body;
 
     // Explicitly convert `termsAgreed` to a boolean
-    const termsAgreedValue = termsAgreed === true; // Ensure true/false
+    const termsAgreedValue = termsAgreed === true;
     console.log("Received payload:", req.body);
-    console.log("Processed terms_agreed value:", termsAgreedValue);
 
     try {
+        await pool.query('BEGIN'); // Start transaction
+
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
-        console.log("Hashed password generated successfully.");
 
-        // Insert into the database with the correctly mapped value
+        // Insert into the users table
         const result = await pool.query(
-            'INSERT INTO users (username, email, password, terms_agreed) VALUES ($1, $2, $3, $4::BOOLEAN) RETURNING *',
-            [username, email, hashedPassword, termsAgreedValue]
+            'INSERT INTO users (email, password, terms_agreed, subscription_status) VALUES ($1, $2, $3::BOOLEAN, $4) RETURNING *',
+            [email, hashedPassword, termsAgreedValue, 'free']
         );
 
-        console.log("User inserted into database:", result.rows[0]);
-
-        // Respond with the created user
+        await pool.query('COMMIT'); // Commit transaction
         res.status(201).json(result.rows[0]);
     } catch (err) {
+        await pool.query('ROLLBACK'); // Rollback on error
         console.error("Error creating user:", err.message);
         res.status(500).json({ error: "Internal server error" });
     }
 };
 
-
-
-
-// Update user
+// Update user account info
 const updateUser = async (req, res) => {
     const { id } = req.params;
-    const { username, email } = req.body;
+    const { email, subscription_status } = req.body;
+
     try {
         const result = await pool.query(
-            'UPDATE users SET username = $1, email = $2 WHERE id = $3 RETURNING *',
-            [username, email, id]
+            'UPDATE users SET email = $1, subscription_status = $2 WHERE id = $3 RETURNING *',
+            [email, subscription_status, id]
         );
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'User not found' });
@@ -81,7 +76,7 @@ const updateUser = async (req, res) => {
     }
 };
 
-// Delete user
+// Delete user account
 const deleteUser = async (req, res) => {
     const { id } = req.params;
     try {
