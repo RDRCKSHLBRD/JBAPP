@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const tableDisplay = document.getElementById("table-display");
     const resetAllButton = document.getElementById("reset-all-button");
     const refreshButton = document.getElementById("refresh-button");
-    const loadDataButton = document.getElementById("load-data-button"); // Ensure this is defined
+    const loadDataButton = document.getElementById("load-data-button");
+    const loadProfileButton = document.getElementById("load-profile-button"); // New button for profiles
 
     // Log API call activity
     function logApiCall(endpoint, method, status) {
@@ -125,11 +126,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Monitor users and jobs with the Load Data button
+    // Monitor users, jobs, and profiles with the Load Data button
     if (loadDataButton) {
         loadDataButton.addEventListener("click", () => {
             fetchData("/api/users");
             fetchData("/api/jobs");
+        });
+    }
+
+    // Fetch profiles with a dedicated button
+    if (loadProfileButton) {
+        loadProfileButton.addEventListener("click", () => {
+            fetchData("/api/profile");
         });
     }
 
