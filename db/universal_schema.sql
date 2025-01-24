@@ -12,6 +12,7 @@ CREATE TABLE users (
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     subscription_status VARCHAR(50), -- e.g., 'free', 'premium', etc.
+    terms_agreed BOOLEAN DEFAULT false NOT NULL, -- Indicates if the user agreed to the terms
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

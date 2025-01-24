@@ -4,13 +4,16 @@ const bcrypt = require('bcrypt');
 // Get all users (account-related information only)
 const getAllUsers = async (req, res) => {
     try {
-        const result = await pool.query('SELECT id, email, subscription_status, created_at FROM users');
+        const result = await pool.query(
+            'SELECT id, email, password, terms_agreed, subscription_status, created_at FROM users'
+        );
         res.status(200).json(result.rows);
     } catch (err) {
         console.error('Error fetching users:', err);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
 
 // Get user by ID
 const getUserById = async (req, res) => {
@@ -29,32 +32,43 @@ const getUserById = async (req, res) => {
 
 // Create user (account creation)
 const createUser = async (req, res) => {
-    const { email, password, termsAgreed } = req.body;
-
-    // Explicitly convert `termsAgreed` to a boolean
-    const termsAgreedValue = termsAgreed === true;
-    console.log("Received payload:", req.body);
+    const { email, password, firstName, lastName, termsAgreed } = req.body;
 
     try {
-        await pool.query('BEGIN'); // Start transaction
+        console.log('Request payload:', req.body); // Log the payload
+        await pool.query('BEGIN');
+        console.log('Transaction started');
 
-        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
+        console.log('Hashed password:', hashedPassword); // Log the hashed password
 
-        // Insert into the users table
-        const result = await pool.query(
-            'INSERT INTO users (email, password, terms_agreed, subscription_status) VALUES ($1, $2, $3::BOOLEAN, $4) RETURNING *',
-            [email, hashedPassword, termsAgreedValue, 'free']
+        // Insert into users table
+        const userResult = await pool.query(
+            `INSERT INTO users (email, password, terms_agreed, subscription_status) VALUES ($1, $2, $3::BOOLEAN, $4) RETURNING id`,
+            [email, hashedPassword, termsAgreed, 'free']
         );
+        console.log('User insertion result:', userResult.rows[0]); // Log user insertion
 
-        await pool.query('COMMIT'); // Commit transaction
-        res.status(201).json(result.rows[0]);
+        const userId = userResult.rows[0].id;
+
+        // Insert into profiles table
+        const profileResult = await pool.query(
+            `INSERT INTO profiles (user_id, first_name, last_name) VALUES ($1, $2, $3) RETURNING *`,
+            [userId, firstName, lastName]
+        );
+        console.log('Profile insertion result:', profileResult.rows[0]); // Log profile insertion
+
+        await pool.query('COMMIT');
+        console.log('Transaction committed');
+        res.status(201).json({ message: 'User created successfully', userId });
     } catch (err) {
-        await pool.query('ROLLBACK'); // Rollback on error
-        console.error("Error creating user:", err.message);
-        res.status(500).json({ error: "Internal server error" });
+        await pool.query('ROLLBACK');
+        console.error('Error in createUser route:', err); // Log the error
+        res.status(500).json({ error: 'Internal server error', details: err.message }); // Send detailed error response
     }
 };
+
+
 
 // Update user account info
 const updateUser = async (req, res) => {
